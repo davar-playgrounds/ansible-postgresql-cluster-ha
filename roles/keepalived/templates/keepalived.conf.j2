@@ -1,0 +1,31 @@
+vrrp_script chk_haproxy {
+    script "pgrep haproxy"
+    interval 2
+}
+
+vrrp_instance VI_1 {
+    interface {{ hostvars[inventory_hostname]['ansible_default_ipv4']['interface'] }}
+    state MASTER
+    priority {{ priority_num }}
+
+    virtual_router_id {{ vrouter_id }} 
+    unicast_src_ip {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+    unicast_peer {
+        {% for i in groups['keepalived_node'] %}
+	 {{ hostvars[i]['ansible_default_ipv4']['address'] }}
+	{% endfor %}
+    }
+
+    authentication {
+        auth_type PASS
+        auth_pass GHght54RRerdff
+    }
+
+    track_script {
+        chk_haproxy
+    }
+
+    virtual_ipaddress {
+        {{ vip_address }} dev {{ hostvars[inventory_hostname]['ansible_default_ipv4']['interface'] }}
+    }
+}

@@ -1,0 +1,50 @@
+---
+- name: Check if firewalld package is installed (on RHEL).
+  command: yum list installed firewalld
+  args:
+    warn: false
+  register: firewalld_installed
+  failed_when: false
+  changed_when: false
+  when: ansible_os_family == "RedHat"
+  check_mode: false
+
+- name: Disable the firewalld service (on RHEL, if configured).
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: false
+  when:
+    - ansible_os_family == "RedHat"
+    - firewalld_installed.rc == 0
+
+- name: Check if ufw package is installed (on Ubuntu).
+  command: systemctl status ufw
+  args:
+    warn: false
+  register: ufw_installed
+  failed_when: false
+  changed_when: false
+  when: ansible_distribution == "Ubuntu"
+  check_mode: false
+
+- name: Disable the ufw firewall (on Ubuntu, if configured).
+  systemd:
+    name: ufw
+    state: stopped
+    enabled: false
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ufw_installed.rc == 0
+
+- name: Disable SELinux (on RHEL).
+  selinux:
+    state: disabled
+  register: run_status
+  when: ansible_os_family == "RedHat"
+
+- name: Reboot hosts for apply selinux settings (on RHEL).
+  reboot:
+  when: 
+  - run_status.changed
+  - ansible_os_family == "RedHat"

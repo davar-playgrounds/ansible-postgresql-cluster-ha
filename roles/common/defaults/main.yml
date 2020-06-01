@@ -1,0 +1,7 @@
+---
+python_ver: 36
+required_pack:
+   - "python{{ python_ver }}"
+   - "python{{ python_ver }}-devel"
+   - gcc
+   - unzip

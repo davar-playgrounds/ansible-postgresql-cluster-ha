@@ -1,0 +1,22 @@
+---
+- name: Installing keepalived package (on RedHat)
+  yum:
+    name: keepalived
+  when: ansible_os_family == "RedHat"
+
+- name: Install keepaived package (on Debian)
+  apt:
+    name: keepalived
+  when: ansible_os_family == "Debian"
+
+- name: Replace keepalived.conf as template file
+  template:
+    src: keepalived.conf.j2
+    dest: "/etc/keepalived/keepalived.conf"
+    backup: yes
+
+- name: Starting keepalived service
+  systemd:
+    name: keepalived
+    state: started
+    enabled: yes

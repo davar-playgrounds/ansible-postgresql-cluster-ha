@@ -1,0 +1,29 @@
+---
+- name: Update apt cache (update cache on Debian)
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+    
+- name: # RedHat (update cache on RedHat)
+  command: yum clean all
+  args:
+    warn: false
+  when: ansible_os_family == "RedHat"
+
+# Install packages from repository
+# RedHat
+- name: Install system packages (on RedHat)
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ system_packages }}"
+  when: ansible_os_family == "RedHat"
+
+# Debian
+- name: Install system packages (on Debian)
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ system_packages }}"
+  when: ansible_os_family == "Debian"

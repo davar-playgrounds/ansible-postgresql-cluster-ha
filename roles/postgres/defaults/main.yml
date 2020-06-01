@@ -1,0 +1,10 @@
+postgres_ver: 10
+postgres_bin: "/usr/pgsql-{{ postgres_ver }}/bin"
+
+
+postgres_pack:
+#   - "postgresql{{ postgres_ver }}"
+   - "postgresql{{ postgres_ver }}-server"
+   - "postgresql{{ postgres_ver }}-contrib"
+   - "postgresql{{ postgres_ver }}-devel"
+#   - python-psycopg2

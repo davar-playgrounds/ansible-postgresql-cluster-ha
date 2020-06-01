@@ -1,0 +1,75 @@
+---
+- block:  # Debian/Ubuntu
+    - name: Add repository apt-key
+      apt_key:
+        url: "{{ item.key }}"
+        state: present
+      loop: "{{ apt_repository_keys }}"
+      when: apt_repository_keys | length > 0
+
+    - name: Add repository
+      apt_repository:
+        repo: "{{ item.repo }}"
+        state: present
+        update_cache: true
+      loop: "{{ apt_repository }}"
+      when: apt_repository | length > 0
+  when: ansible_os_family == "Debian"
+
+- block:  # RedHat/CentOS
+
+    # Install Epel Repository
+    - name: Remove epel-release package (if exists)
+      package:
+        name: epel-release
+        state: absent
+
+    - name: Get epel-release-latest rpm package
+      get_url:
+        url: "http://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"  # noqa 204
+        dest: /tmp/
+        timeout: 30
+        validate_certs: false
+
+    - name: Install EPEL repository
+      package:
+        name: "/tmp/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+        state: present
+
+    # Install SCL Repository
+    - name: Install Software Collections (SCL) repository for CentOS 7
+      package:
+        name: centos-release-scl-rh
+        state: present
+      when: (ansible_distribution == 'CentOS' and
+            ansible_distribution_major_version == '7')
+
+    - name: Install Software Collections (SCL) repository for OracleLinux 7
+      yum_repository:
+        name: ol7_software_collections
+        description: Software Collection Library packages for Oracle Linux 7 (x86_64)
+        baseurl: https://yum.oracle.com/repo/OracleLinux/OL7/SoftwareCollections/x86_64/
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+        gpgcheck: true
+        enabled: true
+      when: (ansible_distribution == "OracleLinux" and
+            ansible_distribution_major_version == '7')
+
+    - name: Enable Software Collections (SCL) repository for RedHat 7
+      command: 'sudo yum-config-manager --enable rhel-server-rhscl-7-rpms'
+      when: (ansible_distribution == 'Red Hat Enterprise Linux' and
+            ansible_distribution_major_version == '7')
+
+    # Install PostgreSQL Repository
+    - name: Get pgdg-redhat-repo-latest.noarch.rpm
+      get_url:
+        url: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"  # noqa 204
+        dest: /tmp/
+        timeout: 30
+        validate_certs: false
+
+    - name: Install PostgreSQL repository
+      package:
+        name: /tmp/pgdg-redhat-repo-latest.noarch.rpm
+        state: present
+  when: ansible_os_family == "RedHat"

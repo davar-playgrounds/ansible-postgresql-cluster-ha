@@ -1,0 +1,3 @@
+---
+# PostgreSQL variables
+postgresql_version: "10"

@@ -1,0 +1,36 @@
+- hosts: patroni_node
+  any_errors_fatal: true
+  vars_files:
+    - "inventory/vars/{{ ansible_os_family }}.yml"
+  roles:
+    - { role: common }
+
+- hosts: consul_node
+  roles:
+    - { role: consul }
+
+- hosts: patroni_node
+  vars_files:
+    - inventory/vars/main.yml
+    - "inventory/vars/{{ ansible_os_family }}.yml"
+  roles:
+    - { role: postgres }
+
+- hosts: patroni_node
+  vars_files:
+   - inventory/vars/main.yml
+   - "inventory/vars/{{ ansible_os_family }}.yml"
+  roles:
+    - { role: patroni }
+
+- hosts: haproxy_node
+  roles:
+    - { role: haproxy }
+
+- hosts: keepalived_node
+  roles:
+    - { role: keepalived }
+
+- hosts: haproxy_node
+  roles:
+    - { role: consul-template }

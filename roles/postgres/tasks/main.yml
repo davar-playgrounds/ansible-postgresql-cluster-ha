@@ -1,0 +1,50 @@
+---
+# PostgreSQL prepare for install (for Debian based only)
+- block:
+    - name: Ensure postgresql database-cluster manager package
+      package:
+        name: postgresql-common
+        state: present
+
+    - name: Disable initializing of a default postgresql cluster
+      replace:
+        path: /etc/postgresql-common/createcluster.conf
+        replace: create_main_cluster = false
+        regexp: ^#?create_main_cluster.*$
+
+    - name: Disable log rotation with logrotate for postgresql
+      file:
+        dest: /etc/logrotate.d/postgresql-common
+        state: absent
+  when: ansible_os_family == "Debian"
+
+# Install PostgreSQL from repository
+# RedHat
+- name: Install PostgreSQL packages (on RedHat)
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ postgresql_packages }}"
+  when: ansible_os_family == "RedHat"
+
+# Debian
+- name: Install PostgreSQL packages (on Debian)
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ postgresql_packages }}"
+  when: ansible_os_family == "Debian"
+
+#- name: PostgreSQL | Add path opstgresql bins env to PATH
+#  become: true
+#  blockinfile:
+#    path: $HOME/.bash_profile
+#    create: yes
+#    block: |
+#        ##Postgresql
+#        export PATH="{{ postgres_bin }}/:$PATH"
+
+#- name: "Add dummy host for send variables from role 'postgresql' to 'other' roles"
+#  add_host:
+#    name:   "HOST_DUMMY_HOLDER_PG"
+#    postgres_path_bin:  "{{ postgresql_bin_dir }}"

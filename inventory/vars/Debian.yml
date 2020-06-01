@@ -1,0 +1,24 @@
+---
+# Repository
+apt_repository_keys:
+  - key: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"  # postgresql repository apt key
+apt_repository:
+  - repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+
+
+# Packages (for apt repo)
+system_packages:
+  - python3
+  - python3-dev
+  - python3-psycopg2
+  - python3-setuptools
+  - python3-pip
+  - gcc
+  - unzip
+
+postgresql_packages:
+  - postgresql-{{ postgresql_version }}
+  - postgresql-server-dev-{{ postgresql_version }}
+  - postgresql-contrib-{{ postgresql_version }}
+
+postgresql_bin_dir: "/usr/lib/postgresql/{{ postgresql_version }}/bin"

@@ -1,0 +1,16 @@
+# Packages 
+system_packages:
+  - python3
+  - python3-devel
+  - python3-psycopg2
+  - python3-setuptools
+  - python3-pip
+  - gcc
+  - unzip
+
+postgresql_packages:
+  - postgresql{{ postgresql_version }}-server
+  - postgresql{{ postgresql_version }}-contrib
+  - postgresql{{ postgresql_version }}-devel
+
+postgresql_bin_dir: "/usr/pgsql-{{ postgresql_version }}/bin"

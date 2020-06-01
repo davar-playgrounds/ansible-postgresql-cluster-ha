@@ -1,0 +1,17 @@
+---
+# "Check system" variables
+os_valid:
+  - RedHat
+  - CentOS
+  - Ubuntu
+  - Debian
+
+os_versions:
+  RedHat: 7
+  CentOS: 7
+  Ubuntu: 16.04
+  Debian: 8
+
+# Global settings for HA
+vip_address: 10.220.106.110
+vrouter_id: 48

@@ -1,0 +1,5 @@
+- import_tasks: verify-settings.yml
+- import_tasks: install-components.yml
+- import_tasks: repository-settings.yml
+- import_tasks: install-components.yml
+- import_tasks: security-settings.yml
